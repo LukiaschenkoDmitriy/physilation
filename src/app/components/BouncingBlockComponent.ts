@@ -7,7 +7,8 @@ export interface BouncingBlockData {
         y: number
         width: number,
         height: number
-        color: number
+        color: number,
+        alfaDelta: number
     },
     directions: {
         x: number,
@@ -30,29 +31,27 @@ class BouncingBlockComponent extends AbstractComponent<BouncingBlockData, Graphi
 
         let dt = delta.deltaTime;
 
-        object.x += data.directions.x * dt * data.directions.speedX;
-        object.y += data.directions.y * dt * data.directions.speedY;
+        this.x += data.directions.x * dt * data.directions.speedX;
+        this.y += data.directions.y * dt * data.directions.speedY;
 
-        if (object.x + object.width > this.app.canvas.width || object.x < 0) {
+        if (this.x + this.width > this.app.canvas.width || this.x < 0) {
             data.directions.x *= -1;
         }
 
-        if (object.y + object.height > this.app.canvas.height || object.y < 0) {
+        if (this.y + this.height > this.app.canvas.height || this.y < 0) {
             data.directions.y *= -1;
         }
 
-        object.alpha -= 0.01;
+        this.alpha -= data.rect.alfaDelta * dt;
 
-        if (object.alpha <= 0.0) {
-            this.destroy({
-                children: true,
-            });
+        if (this.alpha <= 0.0) {
+            this.destroy();
         }
     }
 
     public defSetDefaultObjectData(object: Graphics, data: BouncingBlockData): void {
-        object.x = data.rect.x;
-        object.y = data.rect.y;
+        this.x = data.rect.x;
+        this.y = data.rect.y;
     }
 }
 

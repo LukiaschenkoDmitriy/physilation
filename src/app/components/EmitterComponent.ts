@@ -1,5 +1,6 @@
 import { Container, ContainerChild, ContainerOptions, Ticker } from "pixi.js";
 import AbstractComponent, { AbstractComponentData } from "./AbstractComponent";
+import AbstractPhysic from "@App/physics/AbstractPhysic";
 
 type EmmiterChildComponent<DataType, ComponentType> = new (
     app: AbstractComponentData, 
@@ -38,6 +39,12 @@ class EmmiterComponent<DataType, ComponentType extends AbstractComponent<DataTyp
                 children: true,
             });
         }
+    }
+
+    public updatePhysics(delta: Ticker) {
+        this.physics.forEach((physic: AbstractPhysic<any>) => {
+            physic.update(this.children.map((component) => component as AbstractComponent<DataType, any>), delta);
+        });
     }
 
     public defSetDefaultObjectData(object: ContainerChild, data: DataType): void {}
