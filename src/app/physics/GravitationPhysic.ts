@@ -1,4 +1,4 @@
-import AbstractComponent from "@App/components/AbstractComponent";
+import AbstractComponent from "@App/components/basics/AbstractComponent";
 import { Ticker } from "pixi.js";
 import AbstractPhysic from "./AbstractPhysic";
 
@@ -23,7 +23,6 @@ class GravitationPhysic extends AbstractPhysic<GravigationPhysicConfig> {
                 directions.speedY *= -0.8;
             }
         }
-
     }
 
     public validateConfig(config: GravigationPhysicConfig): boolean {

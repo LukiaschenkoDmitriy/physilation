@@ -1,4 +1,4 @@
-import AbstractComponent from "@App/components/AbstractComponent";
+import AbstractComponent from "@App/components/basics/AbstractComponent";
 import { Ticker } from "pixi.js";
 
 abstract class AbstractPhysic<ConfigData> {
@@ -10,8 +10,9 @@ abstract class AbstractPhysic<ConfigData> {
             throw new Error("Invalid config");
         }
     }
-    public abstract defLogic(object: AbstractComponent<any,any>, delta: Ticker, config: ConfigData): void
-    public abstract validateConfig(config: any): boolean;
+    public validateConfig(config: any): boolean {
+        return true;
+    }
     public logic(object: AbstractComponent<any,any>, delta: Ticker, config: ConfigData): void {
         this.defLogic(object, delta, config);
     }
@@ -20,6 +21,8 @@ abstract class AbstractPhysic<ConfigData> {
             this.logic(object, delta, this.config);
         });
     }
+    
+    public abstract defLogic(object: AbstractComponent<any,any>, delta: Ticker, config: ConfigData): void
 }
 
 export default AbstractPhysic;

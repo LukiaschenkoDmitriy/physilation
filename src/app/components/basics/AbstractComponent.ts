@@ -1,14 +1,21 @@
-import AbstractPhysic from "@App/physics/AbstractPhysic";
-import { Container, ContainerChild, ContainerOptions, DestroyOptions, Ticker } from "pixi.js";
+import AbstractEvent from "@App/events/AbstractEvent";
+import EventManager from "@App/managers/EventManager";
+import PhysicsManager from "@App/managers/PhysicManager";
+import { Container, ContainerChild, ContainerOptions, DestroyOptions, EventSystem, Ticker } from "pixi.js";
 
 export interface AbstractComponentData {
-    canvas: HTMLCanvasElement
+    canvas?: HTMLCanvasElement,
+    events?: EventSystem,
+    childIsRenderable?: boolean
 }
 
 abstract class AbstractComponent<DataType, ComponentType extends ContainerChild> extends Container {
     private object: ComponentType;
     private data: DataType;
-    protected physics: AbstractPhysic<any>[] = [];
+    
+    public physicManager: PhysicsManager = new PhysicsManager();
+    public eventManager: EventManager = new EventManager();
+
     protected app: AbstractComponentData;
     protected getCallableData: (() => DataType) | null = null;
     public constructor(app: AbstractComponentData, componentData: DataType | (() => DataType), options?: ContainerOptions<ContainerChild>, additionalOptions?: any) {
@@ -27,41 +34,23 @@ abstract class AbstractComponent<DataType, ComponentType extends ContainerChild>
 
         this.defSetDefaultObjectData(this.object, this.data);
 
-        this.addChild(this.object);
+        if (app.childIsRenderable) {
+            this.addChild(this.object);
+        }
     }
 
     public update(delta: Ticker) {
         this.defExecuteLogic(delta, this.object, this.data);
-        this.updatePhysics(delta);
+        this.eventManager.executeStateActiveEvents(delta, this, this.data);
+        this.updatePhysic(delta);
     }
 
-    public updatePhysics(delta: Ticker) {
-        this.physics.forEach((physic: AbstractPhysic<any>) => {
-            physic.update([this], delta);
-        });
-    }
-
-    public addPhysic(physic: AbstractPhysic<any>) {
-        if (!this.physics.some(p => p.constructor.name === physic.constructor.name)) {
-            this.physics.push(physic);
-        }
-    }
-
-    public removePhysic(physic: AbstractPhysic<any>) {
-        this.physics = this.physics.filter(p => p.constructor.name !== physic.constructor.name);
-    }
-
-    public removePhysicByName(name: string) {
-        this.physics = this.physics.filter(p => p.constructor.name !== name);
+    public updatePhysic(delta: Ticker) {
+        this.physicManager.update([this], delta);
     }
 
     public getData(): DataType {
         return this.data;
-    }
-
-    public destroy(options?: DestroyOptions): void {
-        super.destroy(options);
-        this.physics = [];
     }
 
     public abstract defRender(data: DataType, additionalOptions: any): ComponentType;

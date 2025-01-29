@@ -41,12 +41,23 @@ class EmmiterComponent<DataType, ComponentType extends AbstractComponent<DataTyp
         }
     }
 
-    public updatePhysics(delta: Ticker) {
-        this.physics.forEach((physic: AbstractPhysic<any>) => {
-            physic.update(this.children.map((component) => component as AbstractComponent<DataType, any>), delta);
+    public addPhysicForChilds(physic: AbstractPhysic<any>) {
+        this.children.forEach((child: ContainerChild) => {
+            if (child instanceof AbstractComponent) {
+                child.physicManager.addPhysic(physic);
+            }
         });
     }
 
+    public removePhysicForChilds(physic: AbstractPhysic<any>) {
+        this.children.forEach((child: ContainerChild) => {
+            if (child instanceof AbstractComponent) {
+                child.physicManager.removePhysic(physic);
+            }
+        });
+    }
+
+    public updatePhysics(delta: Ticker) { }
     public defSetDefaultObjectData(object: ContainerChild, data: DataType): void {}
 }
 
